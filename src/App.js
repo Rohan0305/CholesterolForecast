@@ -22,51 +22,56 @@ function App() {
   };
 
   const handleSubmit = async (e) => {
-    console.log(formData);
     e.preventDefault();
+    console.log("Form Data Submitted:", formData);  
   
     try {
       const response = await axios.post('http://localhost:5000/predict', formData);
-      const { predicted_cholesterol, confidence_interval } = response.data;
-      setPredictedRange([confidence_interval[0], confidence_interval[1]]);
+      if (response.data.confidence_interval) {
+        const { confidence_interval } = response.data;
+        setPredictedRange([confidence_interval[0], confidence_interval[1]]);
+      } else {
+        throw new Error("No confidence interval received.");
+      }
     } catch (error) {
       console.error('Error occurred while predicting cholesterol:', error);
     }
   };
+  
 
   return (
-    <div className="App" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+    <div className="App" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: 'orange', minHeight: '100vh'}}>
       <h1>Cholesterol Forecast</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column'}}>
-        <label style={{marginBottom: "5px"}}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', fontSize: '20px'}}>
+        <label style={{marginBottom: "8px"}}>
           Age:
           <input type="text" name="age" value={formData.age} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Height (cm):
           <input type="text" name="height" value={formData.height} onChange={handleChange} />
         </label >
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Weight (kg):
           <input type="text" name="weight" value={formData.weight} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Systolic Blood Pressure:
           <input type="text" name="systolic_bp" value={formData.systolic_bp} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Diastolic Blood Pressure:
           <input type="text" name="diastolic_bp" value={formData.diastolic_bp} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Glucose(mg/dL)
           <input type="text" name="glucose" value={formData.glucose} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Exercise(hours/week)
           <input type="text" name="exercise" value={formData.exercise} onChange={handleChange} />
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Smoker:
           <select name="smoker" value={formData.smoker} onChange={handleChange}>
             <option value="">Select</option>
@@ -74,7 +79,7 @@ function App() {
             <option value="0">No</option>
           </select>
         </label>
-        <label style={{marginBottom: "5px"}}>
+        <label style={{marginBottom: "8px"}}>
           Gender:
           <select name="gender" value={formData.gender} onChange={handleChange}>
             <option value="">Select</option>
@@ -85,10 +90,10 @@ function App() {
         <button style={{width: "200px", height: "50px", borderRadius: "6px", margin: "auto"}} onClick={handleSubmit}>Predict Cholesterol</button>
       </form>
       {predictedRange && (
-        <div style={{margin:"auto"}}>
-          <h2>Predicted Cholesterol Range:</h2>
-          <p>Lower Bound: {predictedRange[0]}</p>
-          <p>Upper Bound: {predictedRange[1]}</p>
+        <div style={{margin:"auto", fontSize: '18px', justifyContent: 'center'}}>
+          <h3>Predicted Cholesterol Range:</h3>
+          <p>Lower Bound: {predictedRange[0].toFixed(1)}</p>
+          <p>Upper Bound: {predictedRange[1].toFixed(1)}</p>
         </div>
       )}
     </div>
